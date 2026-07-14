@@ -37,6 +37,8 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true   # tự bật Pages nếu repo chưa bật (dùng quyền pages: write)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
