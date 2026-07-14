@@ -1,0 +1,4 @@
+# Phần MỞ RỘNG cho tính năng đọc ảnh scan (OMR) — Tuần 3-4.
+# Nặng (kéo theo onnxruntime, opencv...) và lần đầu chạy sẽ tự tải model.
+# Chỉ cài khi cần đọc ảnh:  pip install -r requirements-omr.txt
+oemer

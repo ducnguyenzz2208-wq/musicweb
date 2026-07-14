@@ -36,10 +36,13 @@
 - [x] Test bằng vài file MIDI/MusicXML mẫu (tự tạo bằng script `scripts/tao_file_mau.py`)
 
 ### Tuần 3-4: Tích hợp OMR (đọc ảnh scan)
-- [ ] Cài oemer, test thử với vài ảnh bản nhạc chụp/scan
-- [ ] Viết wrapper: ảnh upload → oemer chạy → xuất MusicXML → nối vào pipeline Tuần 1-2
-- [ ] Xử lý lỗi khi OMR đọc sai/không đọc được (thông báo rõ cho người dùng, không crash)
-- [ ] Ghi chú lại tỷ lệ chính xác thực tế (dùng cho báo cáo/đánh giá sau này)
+- [x] Cài oemer (0.1.8) — thêm vào `requirements-omr.txt` (tách riêng vì nặng)
+- [x] Viết wrapper `omr/reader.py`: ảnh upload → oemer (subprocess) → MusicXML → nối pipeline Tuần 1-2
+- [x] Endpoint `POST /api/parse-image` + `GET /api/omr-status`; frontend tự định tuyến ảnh
+- [x] Xử lý lỗi khi OMR đọc sai/không đọc được (báo tiếng Việt rõ, không crash):
+      chưa cài oemer → 503, ảnh sai định dạng → 400, oemer fail/không ra nốt → 422
+- [ ] Ghi chú tỷ lệ chính xác thực tế: CẦN ảnh khuông nhạc thật để đo (chưa có mẫu
+      trong môi trường dev — thử với ảnh scan thật khi làm báo cáo)
 
 ### Tuần 5-6: Transpose + Frontend
 - [ ] Auto detect tone bài nhạc (`score.analyze('key')` trong music21)
@@ -57,13 +60,16 @@
 
 ## Trạng thái hiện tại
 - Ngày cập nhật: 2026-07-14
-- Giai đoạn đang làm: Xong Tuần 1-2, sẵn sàng vào Tuần 3-4 (OMR)
+- Giai đoạn đang làm: Xong Tuần 1-2 và phần lớn Tuần 3-4 (OMR); tiếp theo là Tuần 5-6 (transpose)
 - Việc vừa hoàn thành:
   - Toàn bộ core logic Tuần 1-2 (parse MusicXML/MIDI → JSON cảm âm)
-  - Giao diện web hoàn chỉnh (làm sớm hơn roadmap): upload kéo thả,
-    bảng cảm âm, thống kê, tải về .txt — tông kem ấm "music studio",
-    sidebar espresso, có dark mode + nút đổi theme, hero đĩa gỗ + waveform,
-    "album art" cho bài đang đọc
+  - Tuần 3-4: tích hợp OMR đọc ảnh (oemer) — wrapper `omr/reader.py`,
+    endpoint /api/parse-image + /api/omr-status, xử lý lỗi mượt
+  - Auto-deploy GitHub Pages (`.github/workflows/pages.yml`) cho bản demo tĩnh;
+    index.html tự hiện banner dẫn sang demo khi không có backend
+  - Giao diện web hoàn chỉnh: upload kéo thả (file + ảnh), bảng cảm âm,
+    thống kê, tải về .txt — tông kem ấm "music studio", sidebar espresso,
+    dark mode + nút đổi theme, hero đĩa gỗ + waveform, "album art" bài đang đọc
   - Thêm `static/demo.html`: bản demo tĩnh chạy không cần server
     (dữ liệu mẫu nhúng sẵn, chọn 3 bài ví dụ) — mở tại /demo.html
   - 3 file nhạc mẫu trong `samples/` (vừa tầm / ngoài tầm / thăng+quãng 2)

@@ -79,16 +79,25 @@ dropzone.addEventListener("drop", (e) => {
   if (file) guiFile(file);
 });
 
+// Đuôi ảnh -> đi qua đường OMR (chậm hơn), còn lại là file nhạc số
+const DUOI_ANH = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"];
+const laAnh = (ten) => DUOI_ANH.some((d) => ten.toLowerCase().endsWith(d));
+
 // ---- Gửi file lên server ----
 async function guiFile(file) {
-  uploadStatus.textContent = `Đang đọc "${file.name}"…`;
+  const anh = laAnh(file.name);
+  const endpoint = anh ? "/api/parse-image" : "/api/parse";
+
+  uploadStatus.textContent = anh
+    ? `Đang đọc ảnh "${file.name}"… (OMR có thể mất 10–60 giây)`
+    : `Đang đọc "${file.name}"…`;
   uploadStatus.className = "upload-status busy";
 
   const form = new FormData();
   form.append("file", file);
 
   try {
-    const res = await fetch("/api/parse", { method: "POST", body: form });
+    const res = await fetch(endpoint, { method: "POST", body: form });
     const data = await res.json();
 
     if (!res.ok) {
@@ -97,7 +106,8 @@ async function guiFile(file) {
     }
 
     ketQuaHienTai = data;
-    uploadStatus.textContent = `Đã đọc xong "${data.ten_file}" — ${data.tong_so_not} nốt nhạc.`;
+    const nhan = anh ? "ảnh (OMR)" : "file";
+    uploadStatus.textContent = `Đã đọc xong ${nhan} "${data.ten_file}" — ${data.tong_so_not} nốt nhạc.`;
     uploadStatus.className = "upload-status";
     veKetQua(data);
   } catch (err) {
@@ -107,6 +117,31 @@ async function guiFile(file) {
     fileInput.value = ""; // cho phép chọn lại đúng file cũ
   }
 }
+
+// ---- Kiểm tra OMR có sẵn sàng không để gợi ý đúng cho người dùng ----
+// Nếu fetch hỏng (vd chạy trên GitHub Pages, không có backend) -> hiện
+// banner dẫn người dùng sang bản demo tĩnh.
+fetch("/api/omr-status")
+  .then((r) => {
+    if (!r.ok) throw new Error("no-backend");
+    return r.json();
+  })
+  .then((d) => {
+    const badge = document.getElementById("omrBadge");
+    if (!badge) return;
+    if (d.omr_san_sang) {
+      badge.textContent = "Đọc ảnh scan: đã bật";
+      badge.classList.add("on");
+    } else {
+      badge.textContent = "Đọc ảnh scan: đang chuẩn bị";
+    }
+  })
+  .catch(() => {
+    const banner = document.getElementById("offlineBanner");
+    if (banner) banner.hidden = false;
+    const badge = document.getElementById("omrBadge");
+    if (badge) badge.textContent = "Cần chạy server để đọc file";
+  });
 
 // ---- Vẽ kết quả ra giao diện ----
 function veKetQua(data) {
@@ -157,7 +192,7 @@ function veKetQua(data) {
   // 4. Playbar: dải cảm âm kiểu waveform
   playbar.hidden = false;
   playbarName.textContent = data.ten_file;
-  playbarSub.textContent = "Cảm âm sáo Đô";
+  playbarSub.textContent = data.nguon === "anh" ? "Cảm âm sáo Đô · từ ảnh (OMR)" : "Cảm âm sáo Đô";
   playbarCount.textContent = `${data.tong_so_not} nốt`;
   vePlaybarStrip(data.notes);
 

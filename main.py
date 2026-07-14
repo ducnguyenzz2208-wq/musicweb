@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Web đọc bản nhạc -> Cảm âm sáo Đô — Backend FastAPI (Tuần 1-2).
+Web đọc bản nhạc -> Cảm âm sáo Đô — Backend FastAPI.
 
-Chức năng hiện có:
-- GET  /            : trang web (static/index.html)
-- POST /api/parse   : nhận file MusicXML/MIDI, trả JSON danh sách cảm âm
+Chức năng:
+- GET  /               : trang web (static/index.html)
+- GET  /api/omr-status : cho biết tính năng đọc ảnh (OMR) có sẵn sàng không
+- POST /api/parse      : nhận file MusicXML/MIDI, trả JSON cảm âm (Tuần 1-2)
+- POST /api/parse-image: nhận ảnh bản nhạc scan -> OMR -> JSON cảm âm (Tuần 3-4)
 
 Chạy server:
     .venv\\Scripts\\python.exe -m uvicorn main:app --reload
@@ -14,15 +16,20 @@ import tempfile
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from music21 import converter, note as m21_note, chord as m21_chord
 
 from mapping.sao_do import tra_cam_am, ten_truong_do
+from omr.reader import (
+    LoiOMR,
+    DUOI_ANH_HOP_LE,
+    anh_sang_musicxml,
+    oemer_kha_dung,
+)
 
-app = FastAPI(title="Cảm âm sáo Đô", version="0.1.0")
+app = FastAPI(title="Cảm âm sáo Đô", version="0.2.0")
 
-# Các đuôi file chấp nhận (MusicXML và MIDI)
+# Các đuôi file nhạc số chấp nhận (MusicXML và MIDI)
 DUOI_FILE_HOP_LE = {".xml", ".musicxml", ".mxl", ".mid", ".midi"}
 
 
@@ -73,6 +80,26 @@ def doc_ban_nhac(duong_dan: str) -> list[dict]:
     return ket_qua
 
 
+def dong_goi_ket_qua(notes: list[dict], ten_file: str, nguon: str = "file") -> dict:
+    """Gói danh sách nốt thành JSON trả về cho frontend (dùng chung mọi nguồn)."""
+    if not notes:
+        raise HTTPException(status_code=422, detail="Không tìm thấy nốt nhạc nào.")
+    return {
+        "ten_file": ten_file,
+        "nguon": nguon,  # "file" hoặc "anh" — frontend hiển thị nhãn khác nhau
+        "tong_so_not": len([n for n in notes if not n["la_lang"]]),
+        "so_ngoai_tam": sum(1 for n in notes if n["ngoai_tam"]),
+        "so_not_thang": sum(1 for n in notes if n["la_thang"]),
+        "notes": notes,
+    }
+
+
+@app.get("/api/omr-status")
+async def omr_status():
+    """Cho frontend biết tính năng đọc ảnh có bật được không (để đổi giao diện)."""
+    return {"omr_san_sang": oemer_kha_dung()}
+
+
 @app.post("/api/parse")
 async def parse_file(file: UploadFile = File(...)):
     """Nhận file MusicXML/MIDI, trả về danh sách cảm âm sáo Đô dạng JSON."""
@@ -102,18 +129,46 @@ async def parse_file(file: UploadFile = File(...)):
     finally:
         Path(duong_dan_tam).unlink(missing_ok=True)
 
-    if not notes:
-        raise HTTPException(status_code=422, detail="File hợp lệ nhưng không tìm thấy nốt nhạc nào.")
+    return dong_goi_ket_qua(notes, file.filename or "bản nhạc", nguon="file")
 
-    so_ngoai_tam = sum(1 for n in notes if n["ngoai_tam"])
-    so_thang = sum(1 for n in notes if n["la_thang"])
-    return {
-        "ten_file": file.filename,
-        "tong_so_not": len([n for n in notes if not n["la_lang"]]),
-        "so_ngoai_tam": so_ngoai_tam,
-        "so_not_thang": so_thang,
-        "notes": notes,
-    }
+
+@app.post("/api/parse-image")
+async def parse_image(file: UploadFile = File(...)):
+    """Nhận ẢNH bản nhạc scan/chụp -> OMR (oemer) -> cảm âm sáo Đô.
+
+    Đây là tính năng thử nghiệm (Tuần 3-4): độ chính xác phụ thuộc chất
+    lượng ảnh. Lỗi được báo rõ ràng, không làm sập server.
+    """
+    duoi = Path(file.filename or "").suffix.lower()
+    if duoi not in DUOI_ANH_HOP_LE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Chỉ nhận ảnh {', '.join(sorted(DUOI_ANH_HOP_LE))} — bạn gửi '{duoi or 'không rõ'}'",
+        )
+
+    noi_dung = await file.read()
+    if not noi_dung:
+        raise HTTPException(status_code=400, detail="Ảnh rỗng, hãy chọn ảnh khác.")
+
+    # Làm việc trong 1 thư mục tạm rồi dọn sạch sau khi xong
+    with tempfile.TemporaryDirectory() as thu_muc:
+        duong_dan_anh = Path(thu_muc) / f"input{duoi}"
+        duong_dan_anh.write_bytes(noi_dung)
+
+        try:
+            file_xml = anh_sang_musicxml(str(duong_dan_anh), thu_muc)
+            notes = doc_ban_nhac(file_xml)
+        except LoiOMR as loi:
+            # Chưa cài oemer -> 503 (dịch vụ chưa sẵn sàng); còn lại -> 422
+            ma = 503 if not oemer_kha_dung() else 422
+            raise HTTPException(status_code=ma, detail=str(loi))
+        except Exception as loi:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Đọc được ảnh nhưng không dựng được cảm âm: {loi}",
+            )
+
+    return dong_goi_ket_qua(notes, file.filename or "ảnh bản nhạc", nguon="anh")
 
 
 # Mount static SAU các route API để không che mất /api/*

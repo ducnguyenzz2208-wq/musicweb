@@ -36,6 +36,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
         Hướng dẫn
       </a>
+      <a href="demo.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><path d="m5 3 14 9-14 9V3z"/></svg>
+        Bản demo tĩnh
+      </a>
     </nav>
 
     <nav class="nav-group" aria-label="Dự án">
@@ -58,6 +62,12 @@
 
   <!-- ===== Main ===== -->
   <main class="main" id="doc-ban-nhac">
+
+    <div class="offline-banner" id="offlineBanner" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+      <p>Bản này cần chạy server để đọc file thật. Trên web tĩnh, hãy xem
+        <a href="demo.html">bản demo có sẵn dữ liệu mẫu →</a></p>
+    </div>
 
     <header class="topbar">
       <nav class="crumbs" aria-label="Vị trí">
@@ -102,17 +112,22 @@
     <section class="upload-wrap">
       <div class="section-head">
         <h2>Tải bản nhạc lên</h2>
-        <span class="section-hint">.musicxml · .xml · .mxl · .mid · .midi</span>
+        <span class="section-hint">File nhạc hoặc ảnh scan</span>
       </div>
 
       <div class="dropzone" id="dropzone" tabindex="0" role="button"
-           aria-label="Kéo thả hoặc bấm để chọn file bản nhạc">
+           aria-label="Kéo thả hoặc bấm để chọn file bản nhạc hoặc ảnh scan">
         <span class="dz-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="30" height="30" aria-hidden="true"><path d="M12 13v8"/><path d="m8 17 4-4 4 4"/><path d="M20.4 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"/></svg>
         </span>
         <p class="dz-main">Kéo thả file vào đây, hoặc <span class="dz-link">chọn từ máy</span></p>
-        <p class="dz-sub">File MusicXML xuất từ MuseScore hoặc file MIDI đều dùng được</p>
-        <input type="file" id="fileInput" accept=".xml,.musicxml,.mxl,.mid,.midi" hidden>
+        <p class="dz-sub">File nhạc số (MusicXML/MIDI) — hoặc ảnh chụp/scan bản nhạc (PNG/JPG)</p>
+        <div class="dz-formats" aria-hidden="true">
+          <span class="fmt">MusicXML</span><span class="fmt">MIDI</span>
+          <span class="fmt">PNG</span><span class="fmt">JPG</span>
+          <span class="omr-badge" id="omrBadge">Đọc ảnh scan: đang kiểm tra…</span>
+        </div>
+        <input type="file" id="fileInput" accept=".xml,.musicxml,.mxl,.mid,.midi,.png,.jpg,.jpeg,.bmp,.tif,.tiff" hidden>
       </div>
 
       <p class="upload-status" id="uploadStatus" role="status" aria-live="polite"></p>

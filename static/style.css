@@ -222,6 +222,15 @@ body {
 /* ===== Main ===== */
 .main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 
+.offline-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--accent-soft); color: var(--accent-deep);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--r-md); padding: 12px 16px; font-size: 13px;
+}
+.offline-banner svg { flex: none; }
+.offline-banner a { color: var(--accent-deep); font-weight: 600; }
+
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; padding: 2px 4px;
@@ -354,6 +363,24 @@ body {
 .dz-main { font-size: 15.5px; font-weight: 500; }
 .dz-link { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .dz-sub { font-size: 12.5px; color: var(--muted); }
+.dz-formats { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.dz-formats .fmt {
+  font: 600 10.5px var(--font-mono); letter-spacing: .04em; text-transform: uppercase;
+  color: var(--text-2); background: var(--surface-inset);
+  border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px;
+}
+.omr-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px 10px;
+}
+.omr-badge::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); flex: none;
+}
+.omr-badge.on { color: var(--accent-deep); background: var(--accent-soft); border-color: transparent; }
+.omr-badge.on::before { background: #3E9E5B; }
 
 .upload-status { min-height: 22px; margin-top: 12px; font-size: 13.5px; color: var(--muted); }
 .upload-status.error { color: var(--danger); font-weight: 500; }

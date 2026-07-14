@@ -1,0 +1,48 @@
+# Tự động deploy bản web tĩnh (thư mục static/) lên GitHub Pages.
+# Bản đầy đủ (upload file) cần chạy server FastAPI ở máy; trên Pages
+# thì demo.html chạy được luôn vì đã nhúng sẵn dữ liệu mẫu.
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Chỉ chạy 1 deploy tại một thời điểm
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Chuẩn bị site
+        run: |
+          mkdir -p _site
+          cp -r static/* _site/
+          # Không có backend trên Pages: index.html sẽ tự phát hiện và
+          # hiện banner dẫn sang demo.html (chạy được vì nhúng dữ liệu mẫu).
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
