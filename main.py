@@ -33,16 +33,42 @@ app = FastAPI(title="Cảm âm sáo Đô", version="0.2.0")
 DUOI_FILE_HOP_LE = {".xml", ".musicxml", ".mxl", ".mid", ".midi"}
 
 
+def _cao_do_tb(part) -> float:
+    """Cao độ trung bình của 1 bè (dùng để đoán bè nào là giai điệu)."""
+    cac_midi = []
+    for n in part.flatten().notes:
+        if isinstance(n, m21_chord.Chord):
+            cac_midi.append(max(p.midi for p in n.pitches))
+        else:
+            cac_midi.append(n.pitch.midi)
+    return sum(cac_midi) / len(cac_midi) if cac_midi else 0.0
+
+
+def chon_be_giai_dieu(score):
+    """Chọn bè để lấy cảm âm.
+
+    Bản nhạc piano có 2 khuông (treble + bass) = 2 bè. Sáo chỉ thổi giai
+    điệu, nên phải lấy bè CAO NHẤT — nếu flatten cả bản thì nốt bass sẽ bị
+    trộn vào giữa giai điệu và cảm âm ra sai bét.
+    """
+    parts = list(getattr(score, "parts", []))
+    if len(parts) <= 1:
+        return score  # chỉ 1 bè (hoặc file MIDI phẳng) -> dùng luôn
+    return max(parts, key=_cao_do_tb)
+
+
 def doc_ban_nhac(duong_dan: str) -> list[dict]:
     """Parse file nhạc bằng music21, trả về danh sách nốt kèm cảm âm.
 
-    Với hợp âm (chord) thì lấy nốt cao nhất — thường là giai điệu chính.
+    Chỉ lấy bè giai điệu (bè cao nhất) — xem chon_be_giai_dieu().
+    Trong 1 bè, nếu gặp hợp âm thì lấy nốt cao nhất.
     Dấu lặng (rest) cũng đưa vào để người thổi biết chỗ ngắt hơi.
     """
     score = converter.parse(duong_dan)
+    giai_dieu = chon_be_giai_dieu(score)
     ket_qua = []
 
-    for phan_tu in score.flatten().notesAndRests:
+    for phan_tu in giai_dieu.flatten().notesAndRests:
         if isinstance(phan_tu, m21_note.Note):
             p = phan_tu.pitch
         elif isinstance(phan_tu, m21_chord.Chord):

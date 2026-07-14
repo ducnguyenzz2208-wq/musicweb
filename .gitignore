@@ -11,3 +11,7 @@ __pycache__/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Ket qua/cache OMR tam thoi
+samples/omr_*/
+*.pkl

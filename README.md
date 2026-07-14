@@ -15,7 +15,13 @@ Dự án luyện tập — xem lộ trình chi tiết trong [PROGRESS.md](PROGRE
 
 **Tuần 3–4 · OMR (đọc ảnh scan)** *(thử nghiệm)*
 - Upload ảnh `.png` / `.jpg` → chạy `oemer` (OMR pretrained) → MusicXML → cùng pipeline cảm âm
-- Lỗi được báo rõ ràng, không làm sập server (ảnh mờ, không phải khuông nhạc, chưa cài oemer…)
+- Tự chọn bè giai điệu (bỏ bè bass) khi bản nhạc có 2 khuông kiểu piano
+- Tự thu nhỏ ảnh lớn để chạy nhanh hơn; lỗi được báo rõ, không làm sập server
+
+> **Độ chính xác thực đo** (bài "Đàn gà con", ảnh piano 2 khuông): cao độ **26/26 = 100% đúng**,
+> nhưng **trường độ sai gần hết** (oemer trả toàn nốt tròn). Cao độ là thứ quan trọng nhất
+> cho cảm âm sáo nên vẫn dùng được — cần trường độ chuẩn thì hãy dùng file MusicXML/MIDI.
+> Chi tiết trong [PROGRESS.md](PROGRESS.md).
 
 **Giao diện**
 - Kéo thả file/ảnh, bảng cảm âm, thống kê, tải về `.txt`
@@ -29,8 +35,9 @@ Dự án luyện tập — xem lộ trình chi tiết trong [PROGRESS.md](PROGRE
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 
-# 2. (Tuỳ chọn) Bật đọc ảnh scan — nặng, lần đầu tự tải model
+# 2. (Tuỳ chọn) Bật đọc ảnh scan — nặng, chạy chậm (~4 phút/ảnh)
 .venv\Scripts\pip install -r requirements-omr.txt
+.venv\Scripts\python scripts\tai_model_omr.py     # BẮT BUỘC: tải model còn thiếu
 
 # 3. Chạy server
 .venv\Scripts\python -m uvicorn main:app --reload

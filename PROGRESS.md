@@ -41,8 +41,35 @@
 - [x] Endpoint `POST /api/parse-image` + `GET /api/omr-status`; frontend tự định tuyến ảnh
 - [x] Xử lý lỗi khi OMR đọc sai/không đọc được (báo tiếng Việt rõ, không crash):
       chưa cài oemer → 503, ảnh sai định dạng → 400, oemer fail/không ra nốt → 422
-- [ ] Ghi chú tỷ lệ chính xác thực tế: CẦN ảnh khuông nhạc thật để đo (chưa có mẫu
-      trong môi trường dev — thử với ảnh scan thật khi làm báo cáo)
+- [x] Ghi chú tỷ lệ chính xác thực tế — đo trên bài "Đàn gà con" (xem bên dưới)
+
+#### Kết quả đo OMR thực tế (bài "Đàn gà con", ảnh piano 2 khuông, 3621×2560)
+| Hạng mục | Kết quả |
+|----------|---------|
+| Cao độ (pitch) | **26/26 = 100% đúng** |
+| Số nốt | 26/26 đúng |
+| Trường độ (duration) | **Sai gần hết** — oemer trả về toàn "nốt tròn" dù bản nhạc là nhịp 2/4 toàn móc đơn/nốt đen |
+| Dấu lặng | Có **dấu lặng ma** (oemer chèn thêm chỗ không có) |
+| Thời gian chạy | ~250s (sau khi thu nhỏ ảnh về 1800px) |
+
+Kết luận: **oemer đọc cao độ rất tốt, nhưng trường độ không tin được.**
+Với mục tiêu "cảm âm sáo" thì cao độ là thứ quan trọng nhất (người thổi tự
+biết nhịp theo bài), nên vẫn dùng được. Nếu cần trường độ chính xác thì phải
+dùng file MusicXML/MIDI thay vì ảnh.
+
+Ghi chú: 18/26 nốt của bài này nằm DƯỚI tầm sáo Đô (giai điệu ở G4–C5, sáo Đô
+bắt đầu từ C5) → cần transpose lên 1 quãng tám. Đúng việc của Tuần 5-6.
+
+#### 3 lỗi hạ tầng đã gặp và cách sửa (ghi lại kẻo quên)
+1. **oemer thiếu model**: package chỉ ship `unet_big`, thiếu `seg_net/model.onnx`,
+   mà oemer lại chỉ kiểm tra `unet_big` để quyết định có tải hay không → không bao
+   giờ tự tải. Sửa: chạy `python scripts/tai_model_omr.py`.
+2. **OpenCV 5 làm oemer crash**: OpenCV 5 đổi shape trả về của `cv2.HoughLinesP`
+   từ `(N,1,4)` sang `(N,4)` → `IndexError: invalid index to scalar variable`.
+   Sửa: ghim `opencv-python-headless<5`.
+3. **Bè bass lẫn vào giai điệu**: bản piano có 2 khuông trong 1 part (`<staves>2`).
+   `score.flatten()` trộn cả bass vào → cảm âm sai bét (42 nốt lộn xộn).
+   Sửa: `chon_be_giai_dieu()` chọn PartStaff có cao độ trung bình cao nhất.
 
 ### Tuần 5-6: Transpose + Frontend
 - [ ] Auto detect tone bài nhạc (`score.analyze('key')` trong music21)

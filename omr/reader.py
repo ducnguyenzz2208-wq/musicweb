@@ -43,13 +43,37 @@ def oemer_kha_dung() -> bool:
 DUOI_ANH_HOP_LE = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"}
 
 
-def anh_sang_musicxml(duong_dan_anh: str, thu_muc_ra: str, timeout: int = 240) -> str:
+# Ảnh rộng hơn ngưỡng này sẽ được thu nhỏ trước khi chạy OMR.
+# oemer chạy inference theo cửa sổ trượt nên thời gian tăng rất nhanh theo
+# kích thước ảnh (ảnh 3600px mất ~11 phút, thu về 1800px chỉ còn ~2-3 phút)
+# mà độ chính xác cao độ gần như không đổi.
+RONG_TOI_DA = 1800
+
+
+def _thu_nho_neu_can(duong_dan_anh: str, thu_muc: str) -> str:
+    """Thu nhỏ ảnh quá lớn để OMR chạy nhanh hơn. Trả về đường dẫn ảnh dùng thật."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return duong_dan_anh  # không có Pillow thì cứ dùng ảnh gốc
+
+    with Image.open(duong_dan_anh) as im:
+        if im.width <= RONG_TOI_DA:
+            return duong_dan_anh
+        ty_le = RONG_TOI_DA / im.width
+        moi = im.resize((RONG_TOI_DA, round(im.height * ty_le)), Image.LANCZOS)
+        dich = Path(thu_muc) / f"resized_{Path(duong_dan_anh).name}"
+        moi.save(dich)
+    return str(dich)
+
+
+def anh_sang_musicxml(duong_dan_anh: str, thu_muc_ra: str, timeout: int = 600) -> str:
     """Chạy oemer trên 1 ảnh -> trả về đường dẫn file .musicxml sinh ra.
 
     Tham số:
         duong_dan_anh: ảnh đầu vào (đã lưu ra đĩa)
         thu_muc_ra:    thư mục để oemer ghi kết quả
-        timeout:       giây tối đa chờ oemer (mặc định 240s vì lần đầu tải model)
+        timeout:       giây tối đa chờ oemer (OMR chạy khá lâu)
 
     Ném LoiOMR nếu: chưa cài oemer, oemer chạy lỗi, hoặc không sinh ra file.
     """
@@ -57,13 +81,14 @@ def anh_sang_musicxml(duong_dan_anh: str, thu_muc_ra: str, timeout: int = 240) -
     if not oemer:
         raise LoiOMR(
             "Tính năng đọc ảnh (OMR) chưa sẵn sàng trên máy chủ. "
-            "Cần cài thư viện: pip install oemer. "
+            "Cần cài thư viện: pip install -r requirements-omr.txt "
+            "rồi chạy: python scripts/tai_model_omr.py. "
             "Trong lúc chờ, bạn có thể dùng file MusicXML/MIDI."
         )
 
-    anh = Path(duong_dan_anh)
     ra = Path(thu_muc_ra)
     ra.mkdir(parents=True, exist_ok=True)
+    anh = Path(_thu_nho_neu_can(duong_dan_anh, thu_muc_ra))
 
     # oemer <ảnh> -o <thư mục ra>  → sinh <tên ảnh>.musicxml
     try:
@@ -82,9 +107,23 @@ def anh_sang_musicxml(duong_dan_anh: str, thu_muc_ra: str, timeout: int = 240) -
         raise LoiOMR(f"Không chạy được OMR: {loi}")
 
     if proc.returncode != 0:
-        # Lấy vài dòng cuối stderr để gợi ý, nhưng không đổ nguyên trace cho user
-        loi_tom_tat = (proc.stderr or proc.stdout or "").strip().splitlines()
-        goi_y = loi_tom_tat[-1] if loi_tom_tat else "không rõ nguyên nhân"
+        loi_day_du = (proc.stderr or "") + (proc.stdout or "")
+
+        # Hai lỗi "hạ tầng" hay gặp -> chỉ rõ cách sửa thay vì đổ lỗi cho ảnh
+        if "NO_SUCHFILE" in loi_day_du or "model.onnx failed" in loi_day_du:
+            raise LoiOMR(
+                "Thiếu file model của OMR. Chạy lệnh này rồi thử lại: "
+                "python scripts/tai_model_omr.py"
+            )
+        if "invalid index to scalar variable" in loi_day_du:
+            raise LoiOMR(
+                "OMR lỗi do OpenCV quá mới (oemer chỉ chạy với OpenCV 4.x). "
+                'Sửa bằng: pip install "opencv-python-headless<5"'
+            )
+
+        # Còn lại: nhiều khả năng do ảnh
+        dong = loi_day_du.strip().splitlines()
+        goi_y = dong[-1] if dong else "không rõ nguyên nhân"
         raise LoiOMR(
             f"OMR không đọc được ảnh này ({goi_y}). "
             "Hãy thử ảnh rõ nét hơn, chụp thẳng, đủ sáng và chỉ chứa khuông nhạc."

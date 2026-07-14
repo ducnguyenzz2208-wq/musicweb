@@ -1,4 +1,11 @@
 # Phần MỞ RỘNG cho tính năng đọc ảnh scan (OMR) — Tuần 3-4.
-# Nặng (kéo theo onnxruntime, opencv...) và lần đầu chạy sẽ tự tải model.
-# Chỉ cài khi cần đọc ảnh:  pip install -r requirements-omr.txt
+# Nặng và chạy chậm (~vài phút/ảnh). Chỉ cài khi cần đọc ảnh:
+#     pip install -r requirements-omr.txt
+#     python scripts/tai_model_omr.py     <-- BẮT BUỘC: tải model còn thiếu
 oemer
+
+# QUAN TRỌNG: oemer viết cho OpenCV 4.x.
+# OpenCV 5 đổi shape trả về của cv2.HoughLinesP từ (N,1,4) sang (N,4),
+# làm oemer crash: "IndexError: invalid index to scalar variable" (bbox.py:125).
+# Phải ghim < 5 thì OMR mới chạy được.
+opencv-python-headless<5
