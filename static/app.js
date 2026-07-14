@@ -16,13 +16,42 @@ const readingInfo = document.getElementById("readingInfo");
 const readingName = document.getElementById("readingName");
 const readingFacts = document.getElementById("readingFacts");
 
+const coverNote = document.getElementById("coverNote");
+const coverWave = document.getElementById("coverWave");
+
 const playbar = document.getElementById("playbar");
 const playbarName = document.getElementById("playbarName");
 const playbarSub = document.getElementById("playbarSub");
 const playbarStrip = document.getElementById("playbarStrip");
 const playbarCount = document.getElementById("playbarCount");
 
+const themeToggle = document.getElementById("themeToggle");
+const heroWave = document.getElementById("heroWave");
+
 let ketQuaHienTai = null; // giữ kết quả gần nhất để nút "Tải về" dùng
+
+// ---- Theme sáng/tối: nhớ lựa chọn trong localStorage ----
+const themeLuu = localStorage.getItem("saolab-theme");
+if (themeLuu) document.documentElement.setAttribute("data-theme", themeLuu);
+themeToggle?.addEventListener("click", () => {
+  const dangDark =
+    document.documentElement.getAttribute("data-theme") === "dark" ||
+    (!document.documentElement.getAttribute("data-theme") &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const moi = dangDark ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", moi);
+  localStorage.setItem("saolab-theme", moi);
+});
+
+// ---- Waveform trang trí ở hero (chiều cao ngẫu nhiên, nhịp lệch pha) ----
+if (heroWave) {
+  for (let i = 0; i < 16; i++) {
+    const s = document.createElement("span");
+    s.style.height = 8 + Math.round(Math.random() * 20) + "px";
+    s.style.animationDelay = (i * 0.07).toFixed(2) + "s";
+    heroWave.appendChild(s);
+  }
+}
 
 // ---- Chọn file: click hoặc kéo thả ----
 dropzone.addEventListener("click", () => fileInput.click());
@@ -108,10 +137,16 @@ function veKetQua(data) {
   }
 
   resultsSection.hidden = false;
+  resultsSection.classList.remove("reveal");
+  void resultsSection.offsetWidth; // reset animation
+  resultsSection.classList.add("reveal");
 
-  // 3. Rail "Đang đọc"
+  // 3. Rail "Đang đọc" — album art lấy cảm âm nốt đầu tiên
   readingEmpty.hidden = true;
   readingInfo.hidden = false;
+  const notDau = data.notes.find((n) => !n.la_lang);
+  coverNote.textContent = notDau ? notDau.cam_am.replace("2", "") : "♪";
+  veCoverWave(data.notes);
   readingName.textContent = data.ten_file;
   readingFacts.innerHTML = "";
   themFact("Tổng số nốt", data.tong_so_not);
@@ -140,6 +175,24 @@ function themFact(nhan, giaTri, canhBao = false) {
   const div = document.createElement("div");
   div.innerHTML = `<dt>${nhan}</dt><dd${canhBao ? ' class="warn"' : ""}>${giaTri}</dd>`;
   readingFacts.appendChild(div);
+}
+
+// Waveform nhỏ trong "album art" — lấy tối đa 22 nốt
+function veCoverWave(notes) {
+  coverWave.innerHTML = "";
+  const hien = notes.slice(0, 22);
+  for (const n of hien) {
+    const s = document.createElement("span");
+    let h = 20;
+    if (!n.la_lang && n.octave != null) {
+      h = Math.max(15, Math.min(85, 20 + (n.octave - 4) * 22));
+    } else if (n.la_lang) {
+      h = 12;
+    }
+    s.style.height = h + "%";
+    if (n.la_lang) s.style.opacity = ".3";
+    coverWave.appendChild(s);
+  }
 }
 
 // Mỗi nốt là 1 thanh: cao thấp theo cao độ, màu lime; lặng = xám; ngoài tầm = đỏ

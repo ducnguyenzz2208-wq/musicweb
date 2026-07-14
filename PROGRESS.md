@@ -61,7 +61,11 @@
 - Việc vừa hoàn thành:
   - Toàn bộ core logic Tuần 1-2 (parse MusicXML/MIDI → JSON cảm âm)
   - Giao diện web hoàn chỉnh (làm sớm hơn roadmap): upload kéo thả,
-    bảng cảm âm, thống kê, tải về .txt — tông kem ấm, sidebar tối
+    bảng cảm âm, thống kê, tải về .txt — tông kem ấm "music studio",
+    sidebar espresso, có dark mode + nút đổi theme, hero đĩa gỗ + waveform,
+    "album art" cho bài đang đọc
+  - Thêm `static/demo.html`: bản demo tĩnh chạy không cần server
+    (dữ liệu mẫu nhúng sẵn, chọn 3 bài ví dụ) — mở tại /demo.html
   - 3 file nhạc mẫu trong `samples/` (vừa tầm / ngoài tầm / thăng+quãng 2)
   - Đã test: MusicXML, MIDI, file sai định dạng, nốt ngoài tầm, nốt thăng, dấu lặng
 - Việc đang mắc kẹt (nếu có): không
