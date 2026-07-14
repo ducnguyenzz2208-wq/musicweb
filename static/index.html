@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cảm âm sáo Đô — Đọc bản nhạc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22" aria-hidden="true">
+        <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+      </svg>
+      <span>SáoLab</span>
+    </div>
+
+    <nav class="nav-group" aria-label="Công cụ">
+      <p class="nav-title">Công cụ</p>
+      <a href="#doc-ban-nhac" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><path d="M12 3v13"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Đọc bản nhạc
+      </a>
+      <a href="#ket-qua" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
+        Bảng cảm âm
+      </a>
+      <a href="#huong-dan" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+        Hướng dẫn
+      </a>
+    </nav>
+
+    <nav class="nav-group" aria-label="Dự án">
+      <p class="nav-title">Dự án</p>
+      <a href="https://github.com/ducnguyenzz2208-wq/musicweb" target="_blank" rel="noopener" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        GitHub repo
+      </a>
+      <span class="nav-item nav-static">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>
+        Tuần 1 · Core logic
+      </span>
+    </nav>
+
+    <div class="sidebar-foot">
+      <p>Sáo Đô · 6 lỗ bấm</p>
+      <p class="dim">Dự án luyện tập 2026</p>
+    </div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <main class="main" id="doc-ban-nhac">
+
+    <header class="topbar">
+      <nav class="crumbs" aria-label="Vị trí">
+        <span>Cảm âm</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        <strong>Sáo Đô</strong>
+      </nav>
+      <div class="topbar-right">
+        <span class="badge-week">Tuần 1–2</span>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Bản nhạc số → cảm âm</p>
+        <h1>Đọc bản nhạc,<br>xuất cảm âm sáo Đô</h1>
+        <p class="hero-sub">Tải lên file MusicXML hoặc MIDI — hệ thống đọc từng nốt nhạc
+        và đổi thành bảng cảm âm Đô&nbsp;Rê&nbsp;Mi kèm ngón bấm cho sáo Đô 6 lỗ.</p>
+        <div class="hero-meta">
+          <span class="hero-chip">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            MusicXML · MIDI
+          </span>
+          <span class="hero-dot" aria-hidden="true"></span>
+          <span>Sáo Đô 6 lỗ</span>
+          <span class="hero-dot" aria-hidden="true"></span>
+          <span>Miễn phí</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-holes">
+          <span class="h"></span><span class="h"></span><span class="h open"></span>
+          <span class="h open"></span><span class="h open"></span><span class="h open"></span>
+        </div>
+        <p class="hero-art-label">Sol — ●●○○○○</p>
+      </div>
+    </section>
+
+    <!-- Upload -->
+    <section class="upload-wrap">
+      <div class="section-head">
+        <h2>Tải bản nhạc lên</h2>
+        <span class="section-hint">.musicxml · .xml · .mxl · .mid · .midi</span>
+      </div>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button"
+           aria-label="Kéo thả hoặc bấm để chọn file bản nhạc">
+        <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="34" height="34" aria-hidden="true">
+          <path d="M12 13v8"/><path d="m8 17 4-4 4 4"/>
+          <path d="M20.4 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"/>
+        </svg>
+        <p class="dz-main">Kéo thả file vào đây, hoặc <span class="dz-link">chọn từ máy</span></p>
+        <p class="dz-sub">File MusicXML xuất từ MuseScore hoặc file MIDI đều dùng được</p>
+        <input type="file" id="fileInput" accept=".xml,.musicxml,.mxl,.mid,.midi" hidden>
+      </div>
+
+      <p class="upload-status" id="uploadStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- Results -->
+    <section class="results" id="ket-qua" hidden>
+      <div class="section-head">
+        <h2>Bảng cảm âm</h2>
+        <button class="btn-download" id="btnDownload" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Tải về (.txt)
+        </button>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="table-scroll">
+        <table class="note-table" id="noteTable">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Nốt nhạc</th>
+              <th>Cảm âm</th>
+              <th>Ngón bấm</th>
+              <th>Trường độ</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Guide -->
+    <section class="guide" id="huong-dan">
+      <div class="section-head"><h2>Cách đọc ngón bấm</h2></div>
+      <div class="guide-grid">
+        <article class="guide-card">
+          <span class="guide-sym">●</span>
+          <div><h3>Bịt lỗ</h3><p>Ngón tay bịt kín lỗ bấm. Chuỗi đọc từ lỗ gần lỗ thổi nhất.</p></div>
+        </article>
+        <article class="guide-card">
+          <span class="guide-sym">○</span>
+          <div><h3>Mở lỗ</h3><p>Ngón tay nhấc khỏi lỗ bấm, để lỗ mở hoàn toàn.</p></div>
+        </article>
+        <article class="guide-card">
+          <span class="guide-sym">◐</span>
+          <div><h3>Nửa lỗ</h3><p>Bịt một nửa lỗ — dùng cho nốt thăng/giáng, cần tập thêm.</p></div>
+        </article>
+        <article class="guide-card">
+          <span class="guide-sym accent">2</span>
+          <div><h3>Quãng 2</h3><p>Cảm âm có số 2 (vd Đô2): giữ nguyên ngón, thổi hơi mạnh hơn.</p></div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== Right rail ===== -->
+  <aside class="rail">
+    <div class="rail-card now-reading">
+      <div class="rail-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" aria-hidden="true"><path d="M2 12h3l3-8 4 16 3-8h3"/></svg>
+        <h2>Đang đọc</h2>
+      </div>
+      <div class="reading-empty" id="readingEmpty">
+        <div class="reading-art" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="40" height="40"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <p>Chưa có bản nhạc nào.<br>Tải file lên để bắt đầu.</p>
+      </div>
+      <div class="reading-info" id="readingInfo" hidden>
+        <p class="reading-name" id="readingName"></p>
+        <dl class="reading-facts" id="readingFacts"></dl>
+      </div>
+    </div>
+
+    <div class="rail-card">
+      <div class="rail-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+        <h2>Tầm âm sáo Đô</h2>
+      </div>
+      <ul class="range-list">
+        <li><span class="range-key">Thấp nhất</span><span class="range-val">Đô (C5) — ●●●●●●</span></li>
+        <li><span class="range-key">Cao nhất</span><span class="range-val">Si2 (B6) — thổi mạnh</span></li>
+        <li><span class="range-key">Ngoài tầm</span><span class="range-val">Được đánh dấu đỏ, xử lý transpose ở Tuần 5–6</span></li>
+      </ul>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ===== Player-style summary bar ===== -->
+<footer class="playbar" id="playbar" hidden>
+  <div class="playbar-file">
+    <span class="playbar-disc" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="16" height="16"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </span>
+    <div>
+      <p class="playbar-name" id="playbarName"></p>
+      <p class="playbar-sub" id="playbarSub"></p>
+    </div>
+  </div>
+  <div class="playbar-strip" id="playbarStrip" aria-label="Dải cảm âm xem nhanh"></div>
+  <p class="playbar-count" id="playbarCount"></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
